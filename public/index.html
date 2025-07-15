@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Salesforce Validation Rule Viewer</title>
+</head>
+<body>
+<h2>Enter Salesforce Details</h2>
+<form id="sf-form">
+    <input placeholder="Instance URL" name="instanceUrl" required />
+    <input placeholder="Access Token" name="accessToken" required />
+    <input placeholder="sObject Name (e.g., Opportunity)" name="sobjectName" required />
+    <button type="submit">Fetch Validation Rules</button>
+</form>
+<pre id="output"></pre>
+
+<script>
+    document.getElementById('sf-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = new FormData(e.target);
+        const payload = Object.fromEntries(form.entries());
+
+        const res = await fetch('/fetch-validation-rules', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        const { success, rules, error } = await res.json();
+        const output = document.getElementById('output');
+        output.textContent = success
+            ? JSON.stringify(rules, null, 2)
+            : `Error: ${error}`;
+    });
+</script>
+</body>
+</html>
